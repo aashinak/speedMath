@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SpeedCalc – SSC CGL Calculation Speed Trainer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--tx:#0f172a;--mu:#64748b;--ac:#4f46e5;--ac2:#eef0ff;--bd:#e4e7f1;--ok:#059669;--bad:#e11d48;--fl:#f59e0b;--sh:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(15,23,42,.12);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0e1f;--card:#121831;--tx:#e8eafa;--mu:#94a0c8;--ac:#818cf8;--ac2:#1c2247;--bd:#222a4f;--ok:#34d399;--bad:#fb7185;--fl:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a0e1f;--card:#121831;--tx:#e8eafa;--mu:#94a0c8;--ac:#818cf8;--ac2:#1c2247;--bd:#222a4f;--ok:#34d399;--bad:#fb7185;--fl:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;font-feature-settings:"tnum";-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:30}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--bd)}
+.bar{max-width:1080px;margin:auto;display:flex;align-items:center;gap:12px;padding:12px 20px 4px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em}
+.logo i{font-style:normal;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:1rem;box-shadow:0 4px 12px -4px #4f46e5}
+.logo b{color:var(--ac)}.logo em{font-style:normal;font-size:.68rem;font-weight:700;color:var(--mu);border:1px solid var(--bd);border-radius:6px;padding:1px 6px;letter-spacing:.04em}
+.fire{margin-left:auto;display:flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--fl) 14%,transparent);color:var(--fl);font-weight:800;border-radius:99px;padding:6px 14px;font-size:.95rem}
+nav{max-width:1080px;margin:auto;display:flex;gap:2px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+nav button{border:0;border-bottom:2px solid transparent;background:none;color:var(--mu);padding:12px 14px;font:inherit;font-size:.92rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:color .15s}
+nav button:hover{color:var(--tx)}nav button.on{color:var(--ac);border-bottom-color:var(--ac)}
+nav button::before{display:none}
+main{max-width:1080px;margin:auto;padding:28px 20px 64px}
+section{display:none}section.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ph{margin-bottom:20px}.eb{margin:0 0 4px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac)}
+.ph h1{margin:0 0 6px;font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:-.03em;line-height:1.15}
+h2{margin:0 0 16px;font-size:1.6rem;letter-spacing:-.025em}h3{margin:0 0 12px;font-size:1rem;font-weight:700;letter-spacing:-.01em}.mu{color:var(--mu)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:22px;margin-bottom:16px;box-shadow:var(--sh)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px}
+.grid .card{margin:0!important;padding:18px}.grid .mu{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.hero{background:radial-gradient(circle at 85% 10%,rgba(236,72,153,.55),transparent 45%),linear-gradient(135deg,#312e81,#4f46e5 55%,#7c3aed);color:#fff;border:0;display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:28px}
+.ring{--p:0;width:132px;height:132px;border-radius:50%;background:conic-gradient(#fde68a,#fff calc(var(--p)*1%),rgba(255,255,255,.18) 0);display:grid;place-items:center;flex:none}
+.ring div{width:104px;height:104px;border-radius:50%;background:#3a37b0;display:grid;place-items:center;text-align:center;font-weight:800;font-size:1.3rem;line-height:1.1}.ring small{font-weight:500;opacity:.8;font-size:.7rem}
+.big{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-.03em}
+.dots{display:flex;gap:10px;margin-top:14px}.dot{width:34px;text-align:center;font-size:.7rem;font-weight:600;opacity:.9}
+.dot i{display:grid;place-items:center;width:30px;height:30px;margin:0 auto 3px;border-radius:50%;background:rgba(255,255,255,.18);font-style:normal;font-weight:800}
+.dot.m i{background:#fff;color:#ea580c}
+.stat{font-size:1.9rem;font-weight:800;color:var(--tx);letter-spacing:-.03em;margin-top:2px}
+label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--mu);gap:6px;font-weight:600}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:11px 12px;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 18%,transparent)}
+.btn{background:linear-gradient(135deg,#4f46e5,#6d5ef0);color:#fff;border:0;border-radius:12px;padding:12px 24px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 6px 16px -6px #4f46e5;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:none}
+.btn.alt{background:var(--ac2);color:var(--ac);box-shadow:none}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.tp{border:1.5px solid var(--bd);background:var(--card);color:var(--tx);border-radius:16px;padding:14px 6px;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.tp span{display:grid;place-items:center;width:42px;height:42px;margin:0 auto 8px;border-radius:12px;background:var(--ac2);font-size:1.25rem;color:var(--ac)}
+.tp:hover{border-color:var(--ac)}.tp.on{border-color:var(--ac);background:var(--ac2);color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 15%,transparent)}.tp.on span{background:var(--ac);color:#fff}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1.5px solid var(--bd);background:var(--card);color:var(--mu);padding:8px 16px;border-radius:99px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--ac)}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+#setup .btn{margin-top:10px}
+.hud{display:flex;justify-content:space-between;font-weight:700;flex-wrap:wrap;gap:8px;font-size:.95rem}
+.tm{height:6px;background:var(--ac2);border-radius:99px;overflow:hidden;margin:14px 0}.tm i{display:block;height:100%;background:linear-gradient(90deg,#4f46e5,#a855f7);border-radius:99px;transition:width .3s linear}
+.q{font-size:clamp(2.4rem,9vw,4rem);font-weight:800;text-align:center;margin:8px 0 16px;padding:34px 10px;background:var(--ac2);border-radius:18px;letter-spacing:-.02em}
+input.ans{font-size:2rem;font-weight:700;text-align:center;padding:14px}
+.fb{min-height:1.7em;text-align:center;font-weight:700;margin:10px 0}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.chart{display:flex;align-items:flex-end;gap:6px;height:150px;border-bottom:1px solid var(--bd);padding-top:8px}
+.chart div{flex:1;background:var(--ac2);border-radius:8px 8px 0 0;min-height:3px;position:relative;transition:height .4s}.chart div.m{background:linear-gradient(180deg,#7c3aed,#4f46e5)}
+.chart small{position:absolute;top:100%;left:0;right:0;text-align:center;font-size:.66rem;color:var(--mu);margin-top:4px}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%}
+td,th{border-bottom:1px solid var(--bd);padding:11px 12px;text-align:center;white-space:nowrap;font-size:.9rem}
+th{color:var(--mu);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;background:var(--bg)}tr:hover td{background:var(--ac2)}
+details{border:1px solid var(--bd);border-radius:16px;background:var(--card);margin:10px 0;padding:0 20px;box-shadow:var(--sh)}
+summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between}summary::after{content:"+";color:var(--ac);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"−"}details[open] summary{color:var(--ac)}details p{margin-top:0}
+.ex{background:var(--ac2);color:var(--ac);border-radius:8px;padding:2px 8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+footer{text-align:center;color:var(--mu);padding:20px;font-size:.82rem}
+button,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn,.chip,.tp{min-height:46px}
+.acts{display:flex;gap:10px;margin-top:10px}.acts .btn{flex:1;min-height:54px;font-size:1.05rem}
+@media (max-width:700px){
+nav{position:fixed;left:0;right:0;bottom:0;max-width:none;margin:0;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:2px;z-index:40;overflow:visible}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0;font-size:.66rem;border:0;border-radius:12px}
+nav button::before{display:block;font-size:1.25rem}nav button.on{background:var(--ac2)}
+nav button[data-p=home]::before{content:"🏠"}nav button[data-p=practice]::before{content:"🎯"}nav button[data-p=log]::before{content:"📈"}nav button[data-p=tricks]::before{content:"💡"}nav button[data-p=tables]::before{content:"📋"}
+.bar{padding:10px 16px}main{padding:18px 14px 100px}.card{padding:16px;border-radius:18px}.hero{justify-content:center;text-align:center;padding:22px;gap:18px}.dots{justify-content:center}
+.ring{width:112px;height:112px}.ring div{width:88px;height:88px;font-size:1.15rem}.big{font-size:2.4rem}
+.topics{grid-template-columns:repeat(3,1fr);gap:8px}.tp{font-size:.78rem;padding:10px 2px}.tp span{width:36px;height:36px}
+.fields{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr 1fr;gap:10px}.stat{font-size:1.5rem}
+#startBtn,#quit,#rst{width:100%}#quit{margin-top:10px}.q{padding:24px 8px}input,select{font-size:16px}}
+</style></head><body>
+<header><div class="bar"><div class="logo"><i>⚡</i><span>Speed<b>Calc</b></span><em>SSC CGL</em></div><div class="fire" id="hFire">🔥 0</div></div>
+<nav id="nav"><button data-p="home" class="on">Dashboard</button><button data-p="practice">Practice</button><button data-p="log">Progress log</button><button data-p="tricks">Tricks</button><button data-p="tables">Tables</button></nav></header>
+<main>
+<section id="home" class="on"><div class="ph"><p class="eb">Dashboard</p><h1>Build exam-ready calculation speed</h1><p class="mu" style="margin:0">Practise a little every day and keep your streak alive.</p></div>
+<div class="card hero"><div class="ring" id="ring"><div id="ringT">0/20</div></div>
+<div><div class="big" id="hStreak">🔥 0</div><div>day streak · longest <b id="hLong">0</b></div><div class="dots" id="dots"></div></div></div>
+<div class="card"><h3>Daily goal</h3><p class="mu" style="margin-top:0">A day counts toward your streak once you answer this many questions. Miss a day and the streak resets.</p>
+<label class="f" style="max-width:220px">Questions per day<input type="number" id="goal" min="5" max="1000"></label></div>
+<div class="grid" id="sGrid"></div>
+<div class="card" style="margin-top:14px"><p style="margin:0"><button class="btn" onclick="go('practice')">Start practising</button> <span class="mu">Tip: 20 minutes daily beats 2 hours once a week.</span></p></div>
+</section>
+
+<section id="practice"><div class="ph"><p class="eb">Practice</p><h1>Design your own drill</h1><p class="mu" style="margin:0">Choose a topic, set the exact ranges, and start.</p></div>
+<div class="card"><h3>1 · Pick a topic</h3><div class="topics" id="topics"></div></div>
+<div class="card"><h3>2 · Customise it</h3><div id="cfg"></div></div>
+<div class="card" id="setup"><h3>3 · Session</h3>
+<div class="chips" id="cMode"></div><div class="chips" id="cVal"></div>
+<label class="f" style="max-width:200px"><span id="vLbl"></span><input type="number" id="vIn" min="1"></label>
+<div class="chips"><button class="chip" id="cAuto"></button></div>
+<button class="btn" id="startBtn">Start session</button></div>
+<div class="card" id="game" hidden>
+<div class="hud"><span id="hT"></span><span id="hS"></span><span id="hK"></span></div><div class="tm"><i id="bar"></i></div>
+<div class="q" id="qT"></div><input class="ans" id="ans" inputmode="decimal" autocomplete="off" placeholder="Type answer" enterkeyhint="go"><div class="acts"><button class="btn" id="subBtn" onpointerdown="event.preventDefault()">Submit ✓</button><button class="btn alt" id="skipBtn" onpointerdown="event.preventDefault()">Skip →</button></div><div class="fb" id="fb"></div>
+<button class="btn alt" id="quit">End session</button></div>
+<div class="card" id="result" hidden></div>
+</section>
+
+<section id="log">
+<div class="ph"><p class="eb">Progress</p><h1>Your practice log</h1></div>
+<div class="card"><h3>Last 14 days · questions</h3><div class="chart" id="chart"></div><p class="mu" style="margin:22px 0 0;font-size:.85rem">Dark bars reached your daily goal.</p></div>
+<div class="card"><h3>By topic</h3><div class="tbl" id="byT"></div></div>
+<div class="card"><h3>Recent sessions</h3><div class="tbl" id="sess"></div><p><button class="btn alt" id="clr">Clear log</button></p></div>
+</section>
+
+<section id="tricks">
+<h2>Shortcut tricks</h2>
+<details open><summary>×5, ×25, ×125</summary><p>×5 = ×10 ÷ 2: <span class="ex">46×5 = 460÷2 = 230</span><br>×25 = ×100 ÷ 4: <span class="ex">36×25 = 900</span><br>×125 = ×1000 ÷ 8: <span class="ex">24×125 = 3000</span></p></details>
+<details><summary>×9, ×99, ×11</summary><p><span class="ex">47×9 = 470−47 = 423</span> · <span class="ex">35×99 = 3500−35 = 3465</span><br>×11: add the digits in the middle: <span class="ex">36×11 = 3(3+6)6 = 396</span>; carry if needed: <span class="ex">78×11 = 858</span></p></details>
+<details><summary>Squares</summary><p>Ending in 5: n×(n+1) then 25 → <span class="ex">35² = 1225</span><br>Near 50: 2500+100d+d² → <span class="ex">53² = 2809</span><br>Near 100: 10000−200d+d² → <span class="ex">97² = 9409</span><br>(a±b)²: <span class="ex">47² = 2500−300+9 = 2209</span></p></details>
+<details><summary>Two numbers near 100</summary><p>Use deficits: <span class="ex">96×93 → 4, 7 → (96−7)(4×7) = 8928</span></p></details>
+<details><summary>Same tens, units add to 10</summary><p><span class="ex">47×43 → 4×5 | 7×3 → 2021</span></p></details>
+<details><summary>Percentage</summary><p>x% of y = y% of x. 15% = 10% + 5%. Successive changes a and b: a + b + ab/100. +20% then −20% = −4%.</p></details>
+<details><summary>Divide by 5, 25, 125</summary><p>÷5 = ×2 ÷10: <span class="ex">345÷5 = 69</span> · ÷25 = ×4 ÷100 · ÷125 = ×8 ÷1000</p></details>
+<details><summary>Divisibility</summary><p>3/9: digit sum · 4: last two digits · 8: last three · 11: difference of alternate digit sums · 7: double the last digit and subtract.</p></details>
+<details><summary>Exam strategy</summary><p>Estimate when options are far apart, back-solve from the options, skip anything over 60 seconds, and write in aligned columns.</p></details>
+</section>
+
+<section id="tables">
+<h2>Reference tables</h2>
+<div class="card"><h3>Fractions → percent</h3><div class="tbl" id="tF"></div></div>
+<div class="card"><h3>Squares 1–40</h3><div class="tbl" id="tS"></div></div>
+<div class="card"><h3>Cubes 1–20</h3><div class="tbl" id="tC"></div></div>
+<div class="card"><h3>Tables 11–25</h3><div class="tbl" id="tM"></div></div>
+</section>
+</main>
+<footer>SpeedCalc · progress is saved in this browser</footer>
+<script>
+var KEY="speedcalc_v2",S={goal:20,days:{},sess:[],cfg:{},t:"tbl",m:"time",v:60,auto:1};
+try{var r0=localStorage.getItem(KEY);if(r0)Object.assign(S,JSON.parse(r0))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var $=function(i){return document.getElementById(i)},p2=function(n){return(n<10?"0":"")+n};
+function dk(d){d=d||new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
+function ago(n){var d=new Date();d.setDate(d.getDate()-n);return d}
+function met(k){return S.days[k]&&S.days[k].q>=S.goal}
+function streak(){var n=0,i=met(dk())?0:1;while(met(dk(ago(i)))){n++;i++}return n}
+function longest(){var b=0,c=0,pv=null;Object.keys(S.days).filter(met).sort().forEach(function(k){var d=new Date(k+"T00:00:00");c=pv&&Math.round((d-pv)/864e5)===1?c+1:1;pv=d;if(c>b)b=c});return b}
+function go(p){document.querySelectorAll("section").forEach(function(s){s.classList.toggle("on",s.id===p)});document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.p===p)});if(p==="home")drawHome();if(p==="log")drawLog();window.scrollTo(0,0)}
+$("nav").onclick=function(e){if(e.target.dataset.p)go(e.target.dataset.p)};
+
+/* HOME */
+function drawHome(){var t=S.days[dk()],q=t?t.q:0,s=streak();
+$("hFire").textContent="🔥 "+s;$("hStreak").textContent="🔥 "+s;$("hLong").textContent=Math.max(longest(),s);
+$("ring").style.setProperty("--p",Math.min(100,q/S.goal*100));$("ringT").innerHTML=q+"/"+S.goal+"<br><small>today</small>";
+$("goal").value=S.goal;var h="";for(var i=6;i>=0;i--){var d=ago(i);h+='<div class="dot'+(met(dk(d))?" m":"")+'"><i>'+(met(dk(d))?"✓":"")+"</i>"+d.toLocaleDateString(undefined,{weekday:"short"}).slice(0,2)+"</div>"}$("dots").innerHTML=h;
+var tq=0,to=0,bs=0;S.sess.forEach(function(x){tq+=x.q;to+=x.ok;if(x.ok/x.q>=.8&&x.sec>5)bs=Math.max(bs,x.ok/x.sec*60)});
+var c=[["Total questions",tq],["Accuracy",tq?Math.round(to/tq*100)+"%":"–"],["Best speed (Q/min)",bs?bs.toFixed(1):"–"],["Sessions",S.sess.length],["Active days",Object.keys(S.days).length]];
+$("sGrid").innerHTML=c.map(function(x){return'<div class="card" style="margin:0"><div class="mu">'+x[0]+'</div><div class="stat">'+x[1]+"</div></div>"}).join("")}
+$("goal").onchange=function(){var v=parseInt(this.value);if(v>0){S.goal=v;save();drawHome()}};
+
+/* TOPICS */
+function R(a,b){a=Math.ceil(a);b=Math.floor(b);if(a>b){var t=a;a=b;b=t}return Math.floor(Math.random()*(b-a+1))+a}
+var F={
+tbl:{n:"Tables",i:"✖️",f:[["a","Table from",11],["b","Table to",13],["c","Multiplier from",1],["d","Multiplier to",10]],g:function(c){var a=R(c.a,c.b),b=R(c.c,c.d);return{q:a+" × "+b,a:a*b}}},
+mul:{n:"Multiply",i:"🧮",f:[["a","1st number min",12],["b","1st number max",99],["c","2nd number min",11],["d","2nd number max",30]],g:function(c){var a=R(c.a,c.b),b=R(c.c,c.d);return{q:a+" × "+b,a:a*b}}},
+add:{n:"Add",i:"➕",f:[["a","Min",10],["b","Max",999],["c","Terms",2]],g:function(c){var x=[],s=0;for(var i=0;i<Math.max(2,c.c);i++){var v=R(c.a,c.b);x.push(v);s+=v}return{q:x.join(" + "),a:s}}},
+sub:{n:"Subtract",i:"➖",f:[["a","Min",10],["b","Max",999]],g:function(c){var x=R(c.a,c.b),y=R(c.a,c.b);if(x<y){var t=x;x=y;y=t}return{q:x+" − "+y,a:x-y}}},
+div:{n:"Divide",i:"➗",f:[["a","Divisor min",2],["b","Divisor max",25],["c","Answer min",5],["d","Answer max",99]],g:function(c){var d=R(c.a,c.b),k=R(c.c,c.d);return{q:d*k+" ÷ "+d,a:k}}},
+sq:{n:"Squares",i:"²",f:[["a","From",11],["b","To",40]],g:function(c){var n=R(c.a,c.b);return{q:n+"²",a:n*n}}},
+cu:{n:"Cubes",i:"³",f:[["a","From",2],["b","To",20]],g:function(c){var n=R(c.a,c.b);return{q:n+"³",a:n*n*n}}},
+rt:{n:"Roots",i:"√",f:[["a","Root from",11],["b","Root to",40],["c","Type (2=√, 3=∛)",2]],g:function(c){var n=R(c.a,c.b);return c.c==3?{q:"∛"+n*n*n,a:n}:{q:"√"+n*n,a:n}}},
+pct:{n:"Percent",i:"%",f:[["a","Percents (comma list)","10,20,25,12.5,15,30,40,60"],["b","Base min",40],["c","Base max",800]],g:function(c){var l=String(c.a).split(",").map(Number).filter(function(x){return x>0});if(!l.length)l=[10];var p=l[R(0,l.length-1)],b=R(c.b/20,c.c/20)*20;return{q:p+"% of "+b,a:Math.round(b*p)/100,tol:.02}}},
+frac:{n:"Fraction→%",i:"½",f:[["a","Denominator min",2],["b","Denominator max",20]],g:function(c){var d=R(Math.max(2,c.a),Math.max(2,c.b)),n=R(1,d-1);return{q:n+"/"+d+" = ? %",a:Math.round(n/d*1e4)/100,tol:.02}}},
+mix:{n:"Mixed",i:"🎲",f:[],g:null}};
+var KS=Object.keys(F);
+function defs(t){var o={};F[t].f.forEach(function(f){o[f[0]]=f[2]});return o}
+function cfgOf(t){return Object.assign(defs(t),S.cfg[t])}
+function drawPrac(){
+$("topics").innerHTML=KS.map(function(k){return'<button class="tp'+(S.t===k?" on":"")+'" data-t="'+k+'"><span>'+F[k].i+"</span>"+F[k].n+"</button>"}).join("");
+var t=S.t,c=cfgOf(t);
+$("cfg").innerHTML=t==="mix"?'<p class="mu" style="margin:0">Mixed picks random questions from every topic using each topic’s saved settings.</p>':'<div class="fields">'+F[t].f.map(function(f){return'<label class="f">'+f[1]+'<input data-k="'+f[0]+'" type="'+(typeof f[2]==="string"?"text":"number")+'" value="'+c[f[0]]+'"></label>'}).join("")+'</div><p style="margin:12px 0 0"><button class="btn alt" id="rst">Reset to defaults</button></p>';
+$("cMode").innerHTML=[["time","Timed"],["count","Number of questions"]].map(function(x){return'<button class="chip'+(S.m===x[0]?" on":"")+'" data-m="'+x[0]+'">'+x[1]+"</button>"}).join("");
+var pr=S.m==="time"?[30,60,120,300]:[10,25,50,100];
+$("cVal").innerHTML=pr.map(function(v){return'<button class="chip'+(S.v===v?" on":"")+'" data-v="'+v+'">'+(S.m==="time"?v>=60?v/60+" min":v+" s":v+" Qs")+"</button>"}).join("");
+$("vLbl").textContent=S.m==="time"?"Custom seconds":"Custom question count";$("vIn").value=S.v;
+$("cAuto").className="chip"+(S.auto?" on":"");$("cAuto").textContent=(S.auto?"✓ ":"")+"Auto-submit on correct answer"}
+$("topics").onclick=function(e){var b=e.target.closest("[data-t]");if(b){S.t=b.dataset.t;save();drawPrac()}};
+$("cfg").oninput=function(e){var k=e.target.dataset.k;if(!k)return;var v=e.target.type==="text"?e.target.value:parseFloat(e.target.value);if(v===""||(typeof v==="number"&&isNaN(v)))return;(S.cfg[S.t]=S.cfg[S.t]||{})[k]=v;save()};
+$("cfg").onclick=function(e){if(e.target.id==="rst"){delete S.cfg[S.t];save();drawPrac()}};
+$("cMode").onclick=function(e){var m=e.target.dataset.m;if(m){S.m=m;S.v=m==="time"?60:20;save();drawPrac()}};
+$("cVal").onclick=function(e){var v=e.target.dataset.v;if(v){S.v=+v;save();drawPrac()}};
+$("vIn").oninput=function(){var v=parseInt(this.value);if(v>0){S.v=v;save();document.querySelectorAll("#cVal .chip").forEach(function(c){c.classList.toggle("on",+c.dataset.v===v)})}};
+$("cAuto").onclick=function(){S.auto=S.auto?0:1;save();drawPrac()};
+
+/* GAME */
+var G=null,tick=null;
+function gen(){var t=S.t==="mix"?KS[R(0,KS.length-2)]:S.t,q;try{q=F[t].g(cfgOf(t))}catch(e){q={q:"2 + 2",a:4}}q.k=t;q.t0=Date.now();return q}
+function nextQ(){G.cur=gen();$("qT").textContent=G.cur.q;$("ans").value="";$("ans").focus()}
+function upd(){var tm=S.m==="time";$("hT").textContent=tm?"⏱ "+Math.max(0,S.v-G.el)+"s":"⏱ "+G.el+"s · Q "+Math.min(G.tot+1,S.v)+"/"+S.v;$("hS").textContent="Score "+G.score+"/"+G.tot;$("hK").textContent="🔥 "+G.streak;$("bar").style.width=(tm?100-G.el/S.v*100:G.tot/S.v*100)+"%"}
+$("startBtn").onclick=function(){G={el:0,score:0,tot:0,streak:0,best:0,wrong:[],times:[]};$("setup").hidden=true;$("result").hidden=true;$("game").hidden=false;$("fb").textContent="";upd();nextQ();clearInterval(tick);tick=setInterval(function(){G.el++;upd();if(S.m==="time"&&G.el>=S.v)finish()},1000)};
+function submit(v){var q=G.cur;G.tot++;G.times.push((Date.now()-q.t0)/1000);
+if(v===""){G.streak=0;G.wrong.push([q.q,q.a,"skipped"]);$("fb").innerHTML='<span class="mu">Skipped · '+q.a+"</span>"}
+else if(Math.abs(parseFloat(v)-q.a)<=(q.tol||0)+1e-9){G.score++;G.streak++;G.best=Math.max(G.best,G.streak);$("fb").innerHTML='<span class="ok">✓ Correct</span>'}
+else{G.streak=0;G.wrong.push([q.q,q.a,v]);$("fb").innerHTML='<span class="bad">✗ Answer: '+q.a+"</span>"}
+upd();if(S.m==="count"&&G.tot>=S.v)return finish();nextQ()}
+$("ans").onkeydown=function(e){if(e.key==="Enter"&&G)submit(this.value.trim())};
+$("ans").oninput=function(){if(G&&S.auto&&this.value!==""&&Math.abs(parseFloat(this.value)-G.cur.a)<1e-9)submit(this.value.trim())};
+$("quit").onclick=function(){if(G)finish()};
+$("subBtn").onclick=function(){var v=$("ans").value.trim();if(G&&v!=="")submit(v);else $("ans").focus()};
+$("skipBtn").onclick=function(){if(G)submit("")};
+$("ans").onfocus=function(){var s=this;setTimeout(function(){s.scrollIntoView({block:"center",behavior:"smooth"})},300)};
+function finish(){clearInterval(tick);var g=G;G=null;$("game").hidden=true;$("setup").hidden=false;var r=$("result");r.hidden=false;
+if(!g.tot){r.innerHTML="No questions answered, nothing logged.";return}
+var sec=Math.max(g.el,1),acc=Math.round(g.score/g.tot*100),qpm=g.score/sec*60,avg=(g.times.reduce(function(a,b){return a+b},0)/g.times.length).toFixed(1);
+var k=dk(),d=S.days[k]||{q:0,ok:0,sec:0},was=met(k);d.q+=g.tot;d.ok+=g.score;d.sec+=sec;S.days[k]=d;
+var cf=S.t==="mix"?"all topics":F[S.t].f.map(function(f){return cfgOf(S.t)[f[0]]}).join(" / ");
+S.sess.unshift({t:Date.now(),k:S.t,q:g.tot,ok:g.score,sec:sec,cf:cf});S.sess=S.sess.slice(0,300);save();
+var note=!was&&met(k)?'<p class="ok"><b>🎉 Daily goal reached! Streak: '+streak()+" day"+(streak()>1?"s":"")+" 🔥</b></p>":'<p class="mu">Today: '+d.q+"/"+S.goal+" questions</p>";
+r.innerHTML='<h3>Session complete</h3><div class="grid"><div><div class="mu">Score</div><div class="stat">'+g.score+"/"+g.tot+'</div></div><div><div class="mu">Accuracy</div><div class="stat">'+acc+'%</div></div><div><div class="mu">Speed</div><div class="stat">'+qpm.toFixed(1)+' Q/min</div></div><div><div class="mu">Avg/answer</div><div class="stat">'+avg+'s</div></div><div><div class="mu">Best streak</div><div class="stat">'+g.best+"</div></div></div>"+note+
+(g.wrong.length?"<b>Review mistakes</b><ul>"+g.wrong.slice(0,15).map(function(w){return'<li><span class="ex">'+w[0]+"</span> = <b>"+w[1]+'</b> <span class="mu">(you: '+w[2]+")</span></li>"}).join("")+"</ul>":'<p class="ok"><b>Perfect, no mistakes!</b></p>');
+$("hFire").textContent="🔥 "+streak()}
+
+/* LOG */
+function drawLog(){var h="",mx=S.goal;for(var i=13;i>=0;i--){var k=dk(ago(i)),q=S.days[k]?S.days[k].q:0;mx=Math.max(mx,q)}
+for(i=13;i>=0;i--){var dd=ago(i);k=dk(dd);q=S.days[k]?S.days[k].q:0;h+='<div class="'+(met(k)?"m":"")+'" style="height:'+Math.max(2,q/mx*100)+'%" title="'+k+": "+q+' Qs"><small>'+dd.getDate()+"</small></div>"}$("chart").innerHTML=h;
+var by={};S.sess.forEach(function(x){var b=by[x.k]=by[x.k]||{q:0,ok:0,sec:0};b.q+=x.q;b.ok+=x.ok;b.sec+=x.sec});
+var rows=Object.keys(by).map(function(k){var b=by[k];return"<tr><td>"+(F[k]?F[k].i+" "+F[k].n:k)+"</td><td>"+b.q+"</td><td>"+Math.round(b.ok/b.q*100)+"%</td><td>"+(b.ok/b.sec*60).toFixed(1)+"</td></tr>"}).join("");
+$("byT").innerHTML=rows?"<table><tr><th>Topic</th><th>Questions</th><th>Accuracy</th><th>Q/min</th></tr>"+rows+"</table>":'<p class="mu">No data yet. Finish a practice session.</p>';
+$("sess").innerHTML=S.sess.length?"<table><tr><th>When</th><th>Topic</th><th>Settings</th><th>Score</th><th>Acc</th><th>Q/min</th></tr>"+S.sess.slice(0,30).map(function(x){var d=new Date(x.t);return"<tr><td>"+d.toLocaleDateString(undefined,{day:"numeric",month:"short"})+" "+p2(d.getHours())+":"+p2(d.getMinutes())+"</td><td>"+(F[x.k]?F[x.k].n:x.k)+"</td><td>"+x.cf+"</td><td>"+x.ok+"/"+x.q+"</td><td>"+Math.round(x.ok/x.q*100)+"%</td><td>"+(x.ok/x.sec*60).toFixed(1)+"</td></tr>"}).join("")+"</table>":'<p class="mu">Nothing logged yet.</p>'}
+$("clr").onclick=function(){if(confirm("Delete all progress, streak and logs?")){S.days={};S.sess=[];save();drawLog();drawHome()}};
+
+/* TABLES */
+function tbl(id,h,rows){$(id).innerHTML="<table><tr>"+h.map(function(x){return"<th>"+x+"</th>"}).join("")+"</tr>"+rows.map(function(r){return"<tr>"+r.map(function(c){return"<td>"+c+"</td>"}).join("")+"</tr>"}).join("")+"</table>"}
+(function(){var f=["50%","33.33%","25%","20%","16.66%","14.28%","12.5%","11.11%","10%","9.09%","8.33%","7.69%","7.14%","6.66%","6.25%","5.88%","5.55%","5.26%","5%"],r=[];
+for(var i=0;i<f.length;i+=2)r.push(["1/"+(i+2),f[i],f[i+1]?"1/"+(i+3):"",f[i+1]||""]);tbl("tF",["Fraction","%","Fraction","%"],r);
+var s=[],c=[];for(i=1;i<=10;i++){s.push([i,i*i,i+10,(i+10)*(i+10),i+20,(i+20)*(i+20),i+30,(i+30)*(i+30)]);c.push([i,i*i*i,i+10,Math.pow(i+10,3)])}
+tbl("tS",["n","n²","n","n²","n","n²","n","n²"],s);tbl("tC",["n","n³","n","n³"],c);
+var m=[];for(i=11;i<=25;i++){var w=[i];for(var j=1;j<=10;j++)w.push(i*j);m.push(w)}tbl("tM",["×",1,2,3,4,5,6,7,8,9,10],m)})();
+drawPrac();drawHome();
+</script></body></html>
