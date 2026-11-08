@@ -189,7 +189,7 @@ function drawHome(){var t=S.days[dk()],q=t?t.q:0,s=streak();
 $("hFire").textContent="🔥 "+s;$("hStreak").textContent="🔥 "+s;$("hLong").textContent=Math.max(longest(),s);
 $("ring").style.setProperty("--p",Math.min(100,q/S.goal*100));$("ringT").innerHTML=q+"/"+S.goal+"<br><small>today</small>";
 $("goal").value=S.goal;var h="";for(var i=6;i>=0;i--){var d=ago(i);h+='<div class="dot'+(met(dk(d))?" m":"")+'"><i>'+(met(dk(d))?"✓":"")+"</i>"+d.toLocaleDateString(undefined,{weekday:"short"}).slice(0,2)+"</div>"}$("dots").innerHTML=h;
-var tq=0,to=0,bs=0;S.sess.forEach(function(x){tq+=x.q;to+=x.ok;if(x.ok/x.q>=.8&&x.sec>5)bs=Math.max(bs,x.ok/x.sec*60)});
+var tq=0,to=0,bs=0;Object.keys(S.days).forEach(function(k){tq+=S.days[k].q||0;to+=S.days[k].ok||0});S.sess.forEach(function(x){if(x.ok/x.q>=.8&&x.sec>5)bs=Math.max(bs,x.ok/x.sec*60)});
 var c=[["Total questions",tq],["Accuracy",tq?Math.round(to/tq*100)+"%":"–"],["Best speed (Q/min)",bs?bs.toFixed(1):"–"],["Sessions",S.sess.length],["Active days",Object.keys(S.days).length]];
 $("sGrid").innerHTML=c.map(function(x){return'<div class="card" style="margin:0"><div class="mu">'+x[0]+'</div><div class="stat">'+x[1]+"</div></div>"}).join("")}
 $("goal").onchange=function(){var v=parseInt(this.value);if(v>0){S.goal=v;save();drawHome()}};
