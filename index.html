@@ -170,11 +170,21 @@ input[type=file]::file-selector-button{font:inherit;font-weight:700;border:0;bor
 </main>
 <footer>SpeedCalc · progress is saved in this browser</footer>
 <script>
-var KEY="speedcalc_v2",S={goal:20,days:{},sess:[],cfg:{},t:"tbl",m:"time",v:60,auto:1};
+var KEY="speedcalc_v2",SMAX=5000,S={goal:20,days:{},sess:[],cfg:{},t:"tbl",m:"time",v:60,auto:1,sc:0,agg:{},bs:0};
 try{var r0=localStorage.getItem(KEY);if(r0)Object.assign(S,JSON.parse(r0))}catch(e){}
 var LEGSET={tbl:1,mul:1,add:1,sub:1,div:1,sq:1,cu:1,rt:1,pct:1,frac:1,mix:1};
 if(S.t3){S.t=S.t3}delete S.t3;
-function save(){try{var o=Object.assign({},S);if(!LEGSET[S.t]){o.t3=S.t;o.t="tbl"}else delete o.t3;localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+function total(){return Math.max(+S.sc||0,S.sess.length)}
+var saveFail=false;
+function save(){var tries=0;for(;;){try{var o=Object.assign({},S);if(!LEGSET[S.t]){o.t3=S.t;o.t="tbl"}else delete o.t3;localStorage.setItem(KEY,JSON.stringify(o));saveFail=false;return true}catch(e){
+/* storage full: lifetime totals live in S.agg/S.sc/S.bs, so only the oldest per-session detail rows are trimmed, never the analysis totals */
+if(S.sess.length>300&&tries<8){S.sess=S.sess.slice(0,Math.max(300,Math.floor(S.sess.length*.7)));tries++}else{saveFail=true;return false}}}}
+function sumSess(){var a={},bs=0;S.sess.forEach(function(x){var b=a[x.k]=a[x.k]||{n:0,q:0,ok:0,sec:0};b.n++;b.q+=x.q;b.ok+=x.ok;b.sec+=x.sec;if(x.q&&x.ok/x.q>=.8&&x.sec>5)bs=Math.max(bs,x.ok/x.sec*60)});return{a:a,bs:bs}}
+/* Lifetime analysis totals never shrink: each is at least what the stored session rows add up to. */
+function fixAgg(){var r=sumSess(),n=0;if(!S.agg||typeof S.agg!=="object"||Array.isArray(S.agg))S.agg={};
+Object.keys(r.a).forEach(function(k){var c=S.agg[k]=S.agg[k]||{n:0,q:0,ok:0,sec:0},b=r.a[k];["n","q","ok","sec"].forEach(function(f){c[f]=Math.max(+c[f]||0,b[f])})});
+Object.keys(S.agg).forEach(function(k){n+=+S.agg[k].n||0});S.bs=Math.max(+S.bs||0,r.bs);S.sc=Math.max(+S.sc||0,S.sess.length,n)}
+fixAgg();
 var $=function(i){return document.getElementById(i)},p2=function(n){return(n<10?"0":"")+n};
 function dk(d){d=d||new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
 function ago(n){var d=new Date();d.setDate(d.getDate()-n);return d}
@@ -189,8 +199,8 @@ function drawHome(){var t=S.days[dk()],q=t?t.q:0,s=streak();
 $("hFire").textContent="🔥 "+s;$("hStreak").textContent="🔥 "+s;$("hLong").textContent=Math.max(longest(),s);
 $("ring").style.setProperty("--p",Math.min(100,q/S.goal*100));$("ringT").innerHTML=q+"/"+S.goal+"<br><small>today</small>";
 $("goal").value=S.goal;var h="";for(var i=6;i>=0;i--){var d=ago(i);h+='<div class="dot'+(met(dk(d))?" m":"")+'"><i>'+(met(dk(d))?"✓":"")+"</i>"+d.toLocaleDateString(undefined,{weekday:"short"}).slice(0,2)+"</div>"}$("dots").innerHTML=h;
-var tq=0,to=0,bs=0;Object.keys(S.days).forEach(function(k){tq+=S.days[k].q||0;to+=S.days[k].ok||0});S.sess.forEach(function(x){if(x.ok/x.q>=.8&&x.sec>5)bs=Math.max(bs,x.ok/x.sec*60)});
-var c=[["Total questions",tq],["Accuracy",tq?Math.round(to/tq*100)+"%":"–"],["Best speed (Q/min)",bs?bs.toFixed(1):"–"],["Sessions",S.sess.length],["Active days",Object.keys(S.days).length]];
+var tq=0,to=0,bs=0;Object.keys(S.days).forEach(function(k){tq+=S.days[k].q||0;to+=S.days[k].ok||0});bs=S.bs||0;
+var c=[["Total questions",tq],["Accuracy",tq?Math.round(to/tq*100)+"%":"–"],["Best speed (Q/min)",bs?bs.toFixed(1):"–"],["Sessions",total()],["Active days",Object.keys(S.days).length]];
 $("sGrid").innerHTML=c.map(function(x){return'<div class="card" style="margin:0"><div class="mu">'+x[0]+'</div><div class="stat">'+x[1]+"</div></div>"}).join("")}
 $("goal").onchange=function(){var v=parseInt(this.value);if(v>0){S.goal=v;save();drawHome()}};
 
@@ -275,8 +285,10 @@ if(!g.tot){r.innerHTML="No questions answered, nothing logged.";return}
 var sec=Math.max(g.el,1),acc=Math.round(g.score/g.tot*100),qpm=g.score/sec*60,avg=(g.times.reduce(function(a,b){return a+b},0)/g.times.length).toFixed(1);
 var k=dk(),d=S.days[k]||{q:0,ok:0,sec:0},was=met(k);d.q+=g.tot;d.ok+=g.score;d.sec+=sec;S.days[k]=d;
 var cf=F[S.t].pool?"all topics":F[S.t].f.map(function(f){return cfgOf(S.t)[f[0]]}).join(" / ");
-S.sess.unshift({t:Date.now(),k:S.t,q:g.tot,ok:g.score,sec:sec,cf:cf});S.sess=S.sess.slice(0,300);save();
+S.sc=total()+1;var ag=S.agg[S.t]=S.agg[S.t]||{n:0,q:0,ok:0,sec:0};ag.n++;ag.q+=g.tot;ag.ok+=g.score;ag.sec+=sec;if(g.score/g.tot>=.8&&sec>5)S.bs=Math.max(S.bs||0,qpm);
+S.sess.unshift({t:Date.now(),k:S.t,q:g.tot,ok:g.score,sec:sec,cf:cf});S.sess=S.sess.slice(0,SMAX);var saved=save();
 var note=!was&&met(k)?'<p class="ok"><b>🎉 Daily goal reached! Streak: '+streak()+" day"+(streak()>1?"s":"")+" 🔥</b></p>":'<p class="mu">Today: '+d.q+"/"+S.goal+" questions</p>";
+if(!saved)note+='<p class="bad"><b>⚠ Could not save to this browser (storage full or blocked). Download a backup from the Log tab now.</b></p>';
 r.innerHTML='<h3>Session complete</h3><div class="grid"><div><div class="mu">Score</div><div class="stat">'+g.score+"/"+g.tot+'</div></div><div><div class="mu">Accuracy</div><div class="stat">'+acc+'%</div></div><div><div class="mu">Speed</div><div class="stat">'+qpm.toFixed(1)+' Q/min</div></div><div><div class="mu">Avg/answer</div><div class="stat">'+avg+'s</div></div><div><div class="mu">Best streak</div><div class="stat">'+g.best+"</div></div></div>"+note+
 (g.wrong.length?"<b>Review mistakes</b><ul>"+g.wrong.slice(0,15).map(function(w){return'<li><span class="ex">'+w[0]+"</span> = <b>"+w[1]+'</b> <span class="mu">(you: '+w[2]+")</span></li>"}).join("")+"</ul>":'<p class="ok"><b>Perfect, no mistakes!</b></p>');
 $("hFire").textContent="🔥 "+streak()}
@@ -289,12 +301,12 @@ for(i=n-1;i>=0;i--){var dd=ago(i),lb=dd.getDate();k=dk(dd);q=S.days[k]?S.days[k]
 if(dd.getDate()===1||i===n-1){lb+="<br>"+dd.toLocaleDateString(undefined,{month:"short"});if(dd.getMonth()===0||i===n-1)lb+=" ’"+String(dd.getFullYear()).slice(2)}
 h+='<div class="'+(met(k)?"m":"")+'" style="height:'+Math.max(2,q/mx*100)+'%" title="'+k+": "+q+' Qs"><small>'+lb+"</small></div>"}$("chart").innerHTML=h;
 var cs=$("cs");cs.style.setProperty("--bw",Math.max(14,(cs.clientWidth-106)/14)+"px");cs.scrollLeft=cs.scrollWidth;
-var by={};S.sess.forEach(function(x){var b=by[x.k]=by[x.k]||{q:0,ok:0,sec:0};b.q+=x.q;b.ok+=x.ok;b.sec+=x.sec});
-var rows=Object.keys(by).map(function(k){var b=by[k];return"<tr><td>"+(F[k]?F[k].i+" "+F[k].n:k)+"</td><td>"+b.q+"</td><td>"+Math.round(b.ok/b.q*100)+"%</td><td>"+(b.ok/b.sec*60).toFixed(1)+"</td></tr>"}).join("");
+var by=S.agg;
+var rows=Object.keys(by).filter(function(k){return by[k].q>0&&by[k].sec>0}).map(function(k){var b=by[k];return"<tr><td>"+(F[k]?F[k].i+" "+F[k].n:k)+"</td><td>"+b.q+"</td><td>"+Math.round(b.ok/b.q*100)+"%</td><td>"+(b.ok/b.sec*60).toFixed(1)+"</td></tr>"}).join("");
 $("byT").innerHTML=rows?"<table><tr><th>Topic</th><th>Questions</th><th>Accuracy</th><th>Q/min</th></tr>"+rows+"</table>":'<p class="mu">No data yet. Finish a practice session.</p>';
 $("sess").innerHTML=S.sess.length?"<table><tr><th>When</th><th>Topic</th><th>Settings</th><th>Score</th><th>Acc</th><th>Q/min</th></tr>"+S.sess.slice(0,30).map(function(x){var d=new Date(x.t);return"<tr><td>"+d.toLocaleDateString(undefined,{day:"numeric",month:"short"})+" "+p2(d.getHours())+":"+p2(d.getMinutes())+"</td><td>"+(F[x.k]?F[x.k].n:x.k)+"</td><td>"+x.cf+"</td><td>"+x.ok+"/"+x.q+"</td><td>"+Math.round(x.ok/x.q*100)+"%</td><td>"+(x.ok/x.sec*60).toFixed(1)+"</td></tr>"}).join("")+"</table>":'<p class="mu">Nothing logged yet.</p>'}
 window.addEventListener("resize",function(){var cs=$("cs");if(cs&&cs.clientWidth)cs.style.setProperty("--bw",Math.max(14,(cs.clientWidth-106)/14)+"px")});
-$("clr").onclick=function(){if(confirm("Delete all progress, streak and logs?")){S.days={};S.sess=[];save();drawLog();drawHome()}};
+$("clr").onclick=function(){if(confirm("Delete all progress, streak and logs?")){S.days={};S.sess=[];S.sc=0;S.agg={};S.bs=0;save();drawLog();drawHome()}};
 
 /* BACKUP */
 var PREV="speedcalc_v2_prev",BKL="speedcalc_v2_bk",pend=null,DREX=/^\d{4}-\d{2}-\d{2}$/;
@@ -307,15 +319,18 @@ function bkMsg(t,c){var m=$("bkMsg");m.className="bkm "+(c||"");m.textContent=t}
 function clean(raw,allowEmpty){
 var o=raw&&typeof raw==="object"&&raw.state&&typeof raw.state==="object"?raw.state:raw;
 if(!o||typeof o!=="object"||Array.isArray(o)||(raw.app!==undefined&&raw.app!=="speedcalc"))return{err:"This doesn’t look like a SpeedCalc backup."};
-var st={days:{},sess:[],cfg:{}},sk=0;
+var st={days:{},sess:[],cfg:{},agg:{}},sk=0;
 if(o.days&&typeof o.days==="object")Object.keys(o.days).forEach(function(k){var d=o.days[k];
 if(DREX.test(k)&&dk(new Date(k+"T00:00:00"))===k&&d&&typeof d==="object"&&nm(d.q,0,1e6)&&nm(d.ok,0,1e6)&&nm(d.sec,0,1e8)){var q=Math.round(d.q);st.days[k]={q:q,ok:Math.min(Math.round(d.ok),q),sec:d.sec}}else sk++});
 if(Array.isArray(o.sess))o.sess.forEach(function(x){
 if(x&&typeof x==="object"&&nm(x.t,0,4e12)&&typeof x.k==="string"&&/^[a-z0-9_]{1,20}$/.test(x.k)&&nm(x.q,1,1e6)&&nm(x.ok,0,1e6)&&nm(x.sec,0,1e8)){var q=Math.round(x.q);
 st.sess.push({t:Math.round(x.t),k:x.k,q:q,ok:Math.min(Math.round(x.ok),q),sec:x.sec,cf:String(x.cf==null?"":x.cf).replace(/[^A-Za-z0-9 ,.\/%+-]/g,"").slice(0,120)})}else sk++});
-st.sess.sort(byT);st.sess=st.sess.slice(0,300);
+st.sess.sort(byT);st.sess=st.sess.slice(0,SMAX);
+if(o.agg&&typeof o.agg==="object"&&!Array.isArray(o.agg))Object.keys(o.agg).forEach(function(k){var a=o.agg[k];if(/^[a-z0-9_]{1,20}$/.test(k)&&a&&typeof a==="object"&&nm(a.n,0,1e8)&&nm(a.q,0,1e10)&&nm(a.ok,0,1e10)&&nm(a.sec,0,1e12)){var q=Math.round(a.q);st.agg[k]={n:Math.round(a.n),q:q,ok:Math.min(Math.round(a.ok),q),sec:a.sec}}});
+if(nm(o.bs,0,1e5))st.bs=o.bs;
 if(o.cfg&&typeof o.cfg==="object")Object.keys(o.cfg).forEach(function(t){var c=o.cfg[t];if(!F.hasOwnProperty(t)||F[t].pool||!c||typeof c!=="object")return;var ok={},has=0;
 F[t].f.forEach(function(f){var v=c[f[0]];if(typeof v==="number"?nm(v,-1e9,1e9):(typeof v==="string"&&typeof f[2]==="string"&&/^[0-9.,\s]{0,80}$/.test(v))){ok[f[0]]=v;has=1}});if(has)st.cfg[t]=ok});
+if(nm(o.sc,0,1e7))st.sc=Math.round(o.sc);
 if(nm(o.goal,1,1000))st.goal=Math.round(o.goal);
 if(o.m==="time"||o.m==="count")st.m=o.m;
 if(nm(o.v,1,1e5))st.v=Math.round(o.v);
@@ -325,9 +340,10 @@ if(!allowEmpty&&!Object.keys(st.days).length&&!st.sess.length)return{err:"No pra
 st.skipped=sk;return{st:st}}
 function snap(state){try{localStorage.setItem(PREV,JSON.stringify({at:Date.now(),state:state}));return true}catch(e){return false}}
 function mergeIn(st){Object.keys(st.days).forEach(function(k){var a=S.days[k],b=st.days[k];if(!a||b.q>a.q)S.days[k]=b});
-var seen={},out=[];S.sess.concat(st.sess).sort(byT).forEach(function(x){var id=x.t+"|"+x.k+"|"+x.q+"|"+x.ok;if(!seen[id]){seen[id]=1;out.push(x)}});S.sess=out.slice(0,300);
+var seen={},out=[];S.sess.concat(st.sess).sort(byT).forEach(function(x){var id=x.t+"|"+x.k+"|"+x.q+"|"+x.ok;if(!seen[id]){seen[id]=1;out.push(x)}});S.sess=out.slice(0,SMAX);S.sc=Math.max(total(),st.sc||0,out.length);
+Object.keys(st.agg||{}).forEach(function(k){var c=S.agg[k]=S.agg[k]||{n:0,q:0,ok:0,sec:0},b=st.agg[k];["n","q","ok","sec"].forEach(function(f){c[f]=Math.max(c[f],b[f])})});S.bs=Math.max(S.bs||0,st.bs||0);fixAgg();
 Object.keys(st.cfg).forEach(function(t){S.cfg[t]=Object.assign({},st.cfg[t],S.cfg[t])})}
-function replaceWith(st){S.days=st.days;S.sess=st.sess;S.cfg=st.cfg;["goal","m","v","auto","t"].forEach(function(k){if(st[k]!==undefined)S[k]=st[k]});if(!F[S.t])S.t="tbl"}
+function replaceWith(st){S.days=st.days;S.sess=st.sess;S.sc=Math.max(st.sc||0,st.sess.length);S.agg=st.agg||{};S.bs=st.bs||0;S.cfg=st.cfg;fixAgg();["goal","m","v","auto","t"].forEach(function(k){if(st[k]!==undefined)S[k]=st[k]});if(!F[S.t])S.t="tbl"}
 function refresh(){drawPrac();drawHome();drawLog()}
 function applied(msg){save();var good=false;try{good=JSON.parse(localStorage.getItem(KEY)).sess.length===S.sess.length}catch(e){}
 pend=null;$("bkAct").innerHTML="";refresh();bkMsg(good?msg:"Applied, but this browser could not save it. Download a backup now.",good?"ok":"bad")}
@@ -342,13 +358,13 @@ function copyTxt(t,cb){function fb(){var ta=document.createElement("textarea");t
 if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){cb(true)},fb);else fb()}
 $("bkCopy").onclick=function(){copyTxt(bkJSON(),function(ok){if(ok){stamp();bkMsg("Backup text copied. Paste it into a note or message to yourself.","ok")}else bkMsg("Couldn’t copy automatically. Use “Download backup” instead.","bad")})};
 function bkLoad(text){$("bkAct").innerHTML="";pend=null;var raw;
-if(text.length>2e6){bkMsg("That file is too large to be a SpeedCalc backup.","bad");return}
+if(text.length>6e6){bkMsg("That file is too large to be a SpeedCalc backup.","bad");return}
 try{raw=JSON.parse(text)}catch(e){bkMsg("Couldn’t read that. It isn’t a valid backup file.","bad");return}
 var r=clean(raw);if(r.err){bkMsg(r.err,"bad");return}
 var st=r.st,ks=Object.keys(st.days).sort(),tq=0;ks.forEach(function(k){tq+=st.days[k].q});
-pend=st;bkMsg("Backup found: "+st.sess.length+" session"+(st.sess.length===1?"":"s")+", "+ks.length+" active day"+(ks.length===1?"":"s")+(ks.length?" ("+fmtD(ks[0])+" → "+fmtD(ks[ks.length-1])+")":"")+", "+tq+" questions."+(st.skipped?" "+st.skipped+" invalid entr"+(st.skipped===1?"y was":"ies were")+" ignored.":""),"ok");
+pend=st;bkMsg("Backup found: "+Math.max(st.sc||0,st.sess.length)+" session"+(Math.max(st.sc||0,st.sess.length)===1?"":"s")+", "+ks.length+" active day"+(ks.length===1?"":"s")+(ks.length?" ("+fmtD(ks[0])+" → "+fmtD(ks[ks.length-1])+")":"")+", "+tq+" questions."+(st.skipped?" "+st.skipped+" invalid entr"+(st.skipped===1?"y was":"ies were")+" ignored.":""),"ok");
 $("bkAct").innerHTML='<div class="acts"><button class="btn" id="bkMerge">Merge with current</button><button class="btn alt" id="bkRepl">Replace current</button></div><p class="mu" style="font-size:.82rem;margin:8px 0 0"><b>Merge</b> keeps everything on this device and adds what’s missing (for a day present in both, the higher question count is kept). <b>Replace</b> makes this device match the backup exactly. A safety copy is saved first so you can undo.</p>'}
-$("bkFile").onchange=function(){var f=this.files&&this.files[0];this.value="";if(!f)return;if(f.size>2e6){bkMsg("That file is too large to be a SpeedCalc backup.","bad");return}
+$("bkFile").onchange=function(){var f=this.files&&this.files[0];this.value="";if(!f)return;if(f.size>6e6){bkMsg("That file is too large to be a SpeedCalc backup.","bad");return}
 var rd=new FileReader();rd.onload=function(){bkLoad(String(rd.result))};rd.onerror=function(){bkMsg("Couldn’t read that file.","bad")};rd.readAsText(f)};
 $("bkChk").onclick=function(){var t=$("bkTxt").value.trim();if(!t){bkMsg("Paste your backup text in the box first.","bad");return}bkLoad(t)};
 $("bkAct").onclick=function(e){var id=e.target.id;if(!pend||(id!=="bkMerge"&&id!=="bkRepl"))return;
