@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+<meta name="author" content="aashinak">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SpeedCalc – SSC CGL Calculation Speed Trainer</title>
@@ -76,6 +77,7 @@ button,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .btn,.chip,.tp{min-height:46px}
 .acts{display:flex;gap:10px;margin-top:10px}.acts .btn{flex:1;min-height:54px;font-size:1.05rem}
 @media (max-width:700px){
+footer{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 nav{position:fixed;left:0;right:0;bottom:0;max-width:none;margin:0;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:2px;z-index:40;overflow:visible}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0;font-size:.66rem;border:0;border-radius:12px}
 nav button::before{display:block;font-size:1.25rem}nav button.on{background:var(--ac2)}
@@ -169,7 +171,7 @@ input[type=file]::file-selector-button{font:inherit;font-weight:700;border:0;bor
 <div class="card"><h3>Alphabet positions</h3><div class="tbl" id="tA"></div></div>
 </section>
 </main>
-<footer>SpeedCalc · progress is saved in this browser</footer>
+<footer>SpeedCalc · progress is saved in this browser<br>Created by <a href="https://github.com/aashinak/speedMath" target="_blank" rel="noopener noreferrer" style="color:var(--ac);font-weight:600;text-decoration:none">aashinak</a> · <a href="https://github.com/aashinak/speedMath" target="_blank" rel="noopener noreferrer" style="color:var(--ac);text-decoration:none">GitHub</a></footer>
 <script>
 var KEY="speedcalc_v2",SMAX=5000,S={goal:20,days:{},sess:[],cfg:{},t:"tbl",m:"time",v:60,auto:1,sc:0,agg:{},bs:0};
 try{var r0=localStorage.getItem(KEY);if(r0)Object.assign(S,JSON.parse(r0))}catch(e){}
